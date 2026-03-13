@@ -1,24 +1,35 @@
 from langchain.agents import AgentType, initialize_agent, Tool
-from langchain_openai import ChatOpenAI
+from langchain_community.chat_models import ChatDashScope
 from .rag_service import RagService
 from .config import Config
+from .skills.document_skill import DocumentSkill
 
 class AgentService:
     def __init__(self):
         # 初始化LLM
-        self.llm = ChatOpenAI(
-            model="gpt-4",
-            api_key=Config.OPENAI_API_KEY
+        self.llm = ChatDashScope(
+            model=Config.QWEN_MODEL,
+            dashscope_api_key=Config.DASHSCOPE_API_KEY
         )
         
         # 初始化RAG服务
         self.rag_service = RagService()
+        
+        # 初始化技能
+        self.skills = self._init_skills()
         
         # 创建工具
         self.tools = self._create_tools()
         
         # 初始化Agent
         self.agent = self._create_agent()
+    
+    def _init_skills(self):
+        """初始化技能"""
+        skills = {
+            "document": DocumentSkill(self.rag_service)
+        }
+        return skills
     
     def _create_tools(self):
         """创建工具列表"""
@@ -34,6 +45,11 @@ class AgentService:
                 description="用于向知识库中添加新的文档。当需要更新知识库时使用。"
             )
         ]
+        
+        # 添加技能中的工具
+        for skill_name, skill in self.skills.items():
+            tools.extend(skill.get_tools())
+        
         return tools
     
     def _create_agent(self):

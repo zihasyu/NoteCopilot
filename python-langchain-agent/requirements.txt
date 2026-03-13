@@ -1,6 +1,8 @@
 langchain
 langchain-core
 langchain-community
-langchain-openai
+dashscope
 python-dotenv
 pymilvus
+fastapi
+uvicorn

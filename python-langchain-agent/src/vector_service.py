@@ -1,5 +1,5 @@
 from pymilvus import connections, FieldSchema, CollectionSchema, DataType, Collection
-from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import DashScopeEmbeddings
 from .config import Config
 
 class VectorService:
@@ -12,9 +12,9 @@ class VectorService:
         )
         
         # 初始化嵌入模型
-        self.embeddings = OpenAIEmbeddings(
+        self.embeddings = DashScopeEmbeddings(
             model=Config.EMBEDDING_MODEL,
-            api_key=Config.OPENAI_API_KEY
+            dashscope_api_key=Config.DASHSCOPE_API_KEY
         )
         
         # 创建或获取集合

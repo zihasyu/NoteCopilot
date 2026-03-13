@@ -1,4 +1,4 @@
-from langchain_openai import ChatOpenAI
+from langchain_community.chat_models import ChatDashScope
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from .vector_service import VectorService
@@ -10,9 +10,9 @@ class RagService:
         self.vector_service = VectorService()
         
         # 初始化LLM
-        self.llm = ChatOpenAI(
-            model="gpt-4",
-            api_key=Config.OPENAI_API_KEY
+        self.llm = ChatDashScope(
+            model=Config.QWEN_MODEL,
+            dashscope_api_key=Config.DASHSCOPE_API_KEY
         )
         
         # 创建检索器
