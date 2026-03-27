@@ -81,3 +81,37 @@ dmypy.json
 # Ruff
 .ruff_cache/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+
+# Environment
+.env
+.env.local
+
+# Milvus
+milvus_data/
+etcd_data/
+minio_data/
+volumes/
+
+# Checkpoints
+checkpoints/
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
