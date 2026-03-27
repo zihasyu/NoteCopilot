@@ -1,6 +1,6 @@
 # NoteCopilot
 
-An intelligent notes assistant built with **LangGraph + Milvus + MCP**, implementing Plan-Execute-Replan Agent workflow for experiment records retrieval, paper notes enhancement, and blog uploading.
+An intelligent notes assistant built with **LangGraph + Milvus(RAG) + MCP**, implementing Plan-Execute-Replan Agent workflow for experiment records retrieval, paper notes enhancement, and blog uploading.[Chinese](./README-cn.md)
 
 ## Architecture Overview
 
@@ -210,7 +210,8 @@ run.bat mcp
 
 **Setup in Claude Desktop:**
 1. Open Claude Desktop Settings
-2. Add MCP server with command: `C:ull/path	oun.bat mcp`
+2. Add MCP server with command: `C:ull/path	o
+un.bat mcp`
 3. Restart Claude
 
 ## Managing Notes
@@ -325,7 +326,3 @@ NoteCopilot/
 ├── *.bat                   # Windows scripts
 └── README.md               # This file
 ```
-
-## License
-
-MIT License - Open source at https://github.com/zihasyu/NoteCopilot
