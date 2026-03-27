@@ -21,31 +21,31 @@ async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     # 启动时执行
     logger.info("=" * 60)
-    logger.info(f"🚀 {config.app_name} v{config.app_version} 启动中...")
-    logger.info(f"📝 环境: {'开发' if config.debug else '生产'}")
-    logger.info(f"🌐 监听地址: http://{config.host}:{config.port}")
-    logger.info(f"📚 API 文档: http://{config.host}:{config.port}/docs")
-    
+    logger.info(f"[{config.app_name}] v{config.app_version} Starting...")
+    logger.info(f"Environment: {'Development' if config.debug else 'Production'}")
+    logger.info(f"Server: http://{config.host}:{config.port}")
+    logger.info(f"API Docs: http://{config.host}:{config.port}/docs")
+
     # 连接 Milvus
-    logger.info("🔌 正在连接 Milvus...")
+    logger.info("Connecting to Milvus...")
     milvus_manager.connect()
-    logger.info("✅ Milvus 连接成功")
-    
+    logger.info("Milvus connected")
+
     logger.info("=" * 60)
-    
+
     yield
-    
+
     # 关闭时执行
-    logger.info("🔌 正在关闭 Milvus 连接...")
+    logger.info("Closing Milvus connection...")
     milvus_manager.close()
-    logger.info(f"👋 {config.app_name} 关闭")
+    logger.info(f"[{config.app_name}] Shutdown")
 
 
 # 创建 FastAPI 应用
 app = FastAPI(
     title=config.app_name,
     version=config.app_version,
-    description="基于 LangChain 的智能oncall运维系统",
+    description="基于 LangGraph 的智能笔记助手 - 实验记录检索、论文笔记增强生成、个人博客上传",
     lifespan=lifespan
 )
 
@@ -62,7 +62,7 @@ app.add_middleware(
 app.include_router(health.router, tags=["健康检查"])
 app.include_router(chat.router, prefix="/api", tags=["对话"])
 app.include_router(file.router, prefix="/api", tags=["文件管理"])
-app.include_router(aiops.router, prefix="/api", tags=["AIOps智能运维"])
+app.include_router(aiops.router, prefix="/api", tags=["NoteCopilot智能笔记"])
 
 # 挂载静态文件
 static_dir = "static"

@@ -1,5 +1,5 @@
-// SuperBizAgent 前端应用
-class SuperBizAgentApp {
+// NoteCopilot 前端应用
+class NoteCopilotApp {
     constructor() {
         this.apiBaseUrl = 'http://localhost:9900/api';
         this.currentMode = 'quick'; // 'quick' 或 'stream'
@@ -616,7 +616,7 @@ class SuperBizAgentApp {
         // 更新输入框状态
         if (this.messageInput) {
             this.messageInput.disabled = this.isStreaming;
-            this.messageInput.placeholder = '问问智能OnCall助手';
+            this.messageInput.placeholder = '问问 NoteCopilot';
         }
     }
 
@@ -1178,13 +1178,14 @@ class SuperBizAgentApp {
     // 发送智能运维请求（SSE 流式模式）
     async sendAIOpsRequest(loadingMessageElement) {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/aiops`, {
+            const response = await fetch(`${this.apiBaseUrl}/assist`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    session_id: this.sessionId
+                    session_id: this.sessionId,
+                    query: "请帮我整理笔记并生成博客文章"
                 })
             });
 
@@ -1279,10 +1280,10 @@ class SuperBizAgentApp {
                                                 this.updateAIOpsMessage(loadingMessageElement, fullResponse, []);
                                                 return true;
                                             } else if (sseMessage.type === 'error') {
-                                                throw new Error(sseMessage.data || sseMessage.message || '智能运维分析失败');
+                                                throw new Error(sseMessage.data || sseMessage.message || '请求处理失败');
                                             }
                                         } catch (e) {
-                                            if (e.message.includes('智能运维')) throw e;
+                                            if (e.message.includes('请求处理')) throw e;
                                             console.log('[AI Ops SSE] 单个JSON解析失败:', jsonStr);
                                         }
                                     }
@@ -1350,7 +1351,7 @@ class SuperBizAgentApp {
                                             this.updateAIOpsMessage(loadingMessageElement, fullResponse, []);
                                             return;
                                         } else if (sseMessage.type === 'error') {
-                                            throw new Error(sseMessage.data || sseMessage.message || '智能运维分析失败');
+                                            throw new Error(sseMessage.data || sseMessage.message || '请求处理失败');
                                         }
                                     } else {
                                         fullResponse += rawData;
@@ -1359,7 +1360,7 @@ class SuperBizAgentApp {
                                         }
                                     }
                                 } catch (e) {
-                                    if (e.message.includes('智能运维')) throw e;
+                                    if (e.message.includes('请求处理')) throw e;
                                     // 非 JSON 格式，直接追加原始数据
                                     fullResponse += rawData;
                                     if (loadingMessageElement) {
@@ -1591,8 +1592,8 @@ class SuperBizAgentApp {
         // 新建对话
         this.newChat();
         
-        // 添加"分析中..."的消息（带旋转动画）
-        const loadingMessage = this.addLoadingMessage('分析中...');
+        // 添加"处理中..."的消息（带旋转动画）
+        const loadingMessage = this.addLoadingMessage('处理中...');
         this.currentAIOpsMessage = loadingMessage; // 保存消息引用用于后续更新
         
         // 设置发送状态
@@ -1602,12 +1603,12 @@ class SuperBizAgentApp {
         try {
             await this.sendAIOpsRequest(loadingMessage);
         } catch (error) {
-            console.error('智能运维分析失败:', error);
+            console.error('请求处理失败:', error);
             // 更新消息为错误信息
             if (loadingMessage) {
                 const messageContent = loadingMessage.querySelector('.message-content');
                 if (messageContent) {
-                    messageContent.textContent = '抱歉，智能运维分析时出现错误：' + error.message;
+                    messageContent.textContent = '抱歉，请求处理时出现错误：' + error.message;
                 }
             }
         } finally {
@@ -1622,10 +1623,10 @@ class SuperBizAgentApp {
         if (this.loadingOverlay) {
             if (show) {
                 this.loadingOverlay.style.display = 'flex';
-                // 更新文字为智能运维
+                // 更新文字
                 const loadingText = this.loadingOverlay.querySelector('.loading-text');
                 const loadingSubtext = this.loadingOverlay.querySelector('.loading-subtext');
-                if (loadingText) loadingText.textContent = '智能运维分析中，请稍候...';
+                if (loadingText) loadingText.textContent = 'NoteCopilot 处理中，请稍候...';
                 if (loadingSubtext) loadingSubtext.textContent = '后端正在处理，请耐心等待';
                 // 防止页面滚动
                 document.body.style.overflow = 'hidden';
@@ -1687,5 +1688,5 @@ document.head.appendChild(style);
 
 // 初始化应用
 document.addEventListener('DOMContentLoaded', () => {
-    new SuperBizAgentApp();
+    new NoteCopilotApp();
 });

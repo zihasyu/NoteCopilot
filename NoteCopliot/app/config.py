@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     )
 
     # 应用配置
-    app_name: str = "SuperBizAgent"
+    app_name: str = "NoteCopilot"
     app_version: str = "1.0.0"
     debug: bool = False
     host: str = "0.0.0.0"
@@ -42,23 +42,29 @@ class Settings(BaseSettings):
     chunk_max_size: int = 800
     chunk_overlap: int = 100
 
-    # MCP 服务配置
-    mcp_cls_transport: str = "streamable-http"
-    mcp_cls_url: str = "http://localhost:8003/mcp"
-    mcp_monitor_transport: str = "streamable-http"
-    mcp_monitor_url: str = "http://localhost:8004/mcp"
+    # MCP 服务配置 - 笔记相关工具
+    mcp_note_search_transport: str = "streamable-http"
+    mcp_note_search_url: str = "http://localhost:8003/mcp"
+    mcp_paper_enhance_transport: str = "streamable-http"
+    mcp_paper_enhance_url: str = "http://localhost:8004/mcp"
+    mcp_blog_upload_transport: str = "streamable-http"
+    mcp_blog_upload_url: str = "http://localhost:8005/mcp"
 
     @property
     def mcp_servers(self) -> Dict[str, Dict[str, Any]]:
         """获取完整的 MCP 服务器配置"""
         return {
-            "cls": {
-                "transport": self.mcp_cls_transport,
-                "url": self.mcp_cls_url,
+            "note_search": {
+                "transport": self.mcp_note_search_transport,
+                "url": self.mcp_note_search_url,
             },
-            "monitor": {
-                "transport": self.mcp_monitor_transport,
-                "url": self.mcp_monitor_url,
+            "paper_enhance": {
+                "transport": self.mcp_paper_enhance_transport,
+                "url": self.mcp_paper_enhance_url,
+            },
+            "blog_upload": {
+                "transport": self.mcp_blog_upload_transport,
+                "url": self.mcp_blog_upload_url,
             }
         }
 

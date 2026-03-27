@@ -1,6 +1,6 @@
 """
-通用 Plan-Execute-Replan 服务
-基于 LangGraph 官方教程实现
+NoteCopilot Plan-Execute-Replan 服务
+基于 LangGraph 的智能笔记助手服务
 """
 
 from typing import AsyncGenerator, Dict, Any
@@ -17,14 +17,14 @@ NODE_EXECUTOR = "executor"
 NODE_REPLANNER = "replanner"
 
 
-class AIOpsService:
-    """通用 Plan-Execute-Replan 服务"""
+class NoteCopilotService:
+    """NoteCopilot Plan-Execute-Replan 智能笔记服务"""
 
     def __init__(self):
         """初始化服务"""
         self.checkpointer = MemorySaver()
         self.graph = self._build_graph()
-        logger.info("Plan-Execute-Replan Service 初始化完成")
+        logger.info("NoteCopilot Service 初始化完成")
 
     def _build_graph(self):
         """构建 Plan-Execute-Replan 工作流"""
@@ -156,106 +156,31 @@ class AIOpsService:
                 "message": f"任务执行出错: {str(e)}"
             }
 
-    async def diagnose(
+    async def assist(
         self,
+        user_input: str,
         session_id: str = "default"
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """
-        AIOps 诊断接口（兼容旧接口）
+        NoteCopilot 智能笔记助手接口
 
         Args:
+            user_input: 用户的任务描述
             session_id: 会话ID
 
         Yields:
-            Dict[str, Any]: 诊断过程的流式事件
+            Dict[str, Any]: 任务执行过程的流式事件
         """
-        # 使用固定的 AIOps 任务描述
-        from textwrap import dedent
-        aiops_task = dedent("""诊断当前系统是否存在告警，如果存在告警请详细分析告警原因并生成诊断报告，诊断报告输出格式要求：
-                ```
-                # 告警分析报告
-
-                ---
-
-                ## 📋 活跃告警清单
-
-                | 告警名称 | 级别 | 目标服务 | 首次触发时间 | 最新触发时间 | 状态 |
-                |---------|------|----------|-------------|-------------|------|
-                | [告警1名称] | [级别] | [服务名] | [时间] | [时间] | 活跃 |
-                | [告警2名称] | [级别] | [服务名] | [时间] | [时间] | 活跃 |
-
-                ---
-
-                ## 🔍 告警根因分析1 - [告警名称]
-
-                ### 告警详情
-                - **告警级别**: [级别]
-                - **受影响服务**: [服务名]
-                - **持续时间**: [X分钟]
-
-                ### 症状描述
-                [根据监控指标描述症状]
-
-                ### 日志证据
-                [引用查询到的关键日志]
-
-                ### 根因结论
-                [基于证据得出的根本原因]
-
-                ---
-
-                ## 🛠️ 处理方案执行1 - [告警名称]
-
-                ### 已执行的排查步骤
-                1. [步骤1]
-                2. [步骤2]
-
-                ### 处理建议
-                [给出具体的处理建议]
-
-                ### 预期效果
-                [说明预期的效果]
-
-                ---
-
-                ## 🔍 告警根因分析2 - [告警名称]
-                [如果有第2个告警，重复上述格式]
-
-                ---
-
-                ## 📊 结论
-
-                ### 整体评估
-                [总结所有告警的整体情况]
-
-                ### 关键发现
-                - [发现1]
-                - [发现2]
-
-                ### 后续建议
-                1. [建议1]
-                2. [建议2]
-
-                ### 风险评估
-                [评估当前风险等级和影响范围]
-                ```
-
-                **重要提醒**：
-                - 最终输出必须是纯 Markdown 文本，不要包含 JSON 结构
-                - 所有内容必须基于工具查询的真实数据，严禁编造
-                - 如果某个步骤失败，在结论中如实说明，不要跳过""")
-
-        async for event in self.execute(aiops_task, session_id):
-            # 转换事件格式以兼容旧的 API
+        async for event in self.execute(user_input, session_id):
+            # 转换事件格式
             if event.get("type") == "complete":
-                # 将 response 包装为 diagnosis 格式
                 yield {
                     "type": "complete",
-                    "stage": "diagnosis_complete",
-                    "message": "诊断流程完成",
-                    "diagnosis": {
+                    "stage": "task_complete",
+                    "message": "任务执行完成",
+                    "result": {
                         "status": "completed",
-                        "report": event.get("response", "")
+                        "response": event.get("response", "")
                     }
                 }
             else:
@@ -338,4 +263,4 @@ class AIOpsService:
 
 
 # 全局单例
-aiops_service = AIOpsService()
+notecopilot_service = NoteCopilotService()

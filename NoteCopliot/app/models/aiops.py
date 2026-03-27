@@ -1,43 +1,50 @@
 """
-AIOps 请求和响应模型
+NoteCopilot 请求和响应模型
 """
 
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
 
 
-class AIOpsRequest(BaseModel):
-    """AIOps 诊断请求"""
-    
+class NoteCopilotRequest(BaseModel):
+    """NoteCopilot 智能笔记助手请求"""
+
     session_id: Optional[str] = Field(
         default="default",
-        description="会话ID，用于追踪诊断历史"
+        description="会话ID，用于追踪对话历史"
     )
-    
+
+    query: Optional[str] = Field(
+        default="",
+        description="用户查询/任务描述，例如：搜索LoRA实验记录、生成论文摘要、发布博客文章"
+    )
+
     class Config:
         json_schema_extra = {
             "example": {
-                "session_id": "session-123"
+                "session_id": "session-123",
+                "query": "搜索LoRA相关实验记录并生成博客文章"
             }
         }
 
 
-class AlertInfo(BaseModel):
-    """告警信息"""
-    alertname: str
-    severity: str
-    instance: str
-    duration: str
-    description: Optional[str] = None
+class NoteSearchResult(BaseModel):
+    """笔记搜索结果"""
+    note_id: str
+    title: str
+    type: str
+    tags: List[str]
+    score: float
+    preview: str
 
 
-class DiagnosisResponse(BaseModel):
-    """诊断响应（非流式）"""
-    
+class AssistResponse(BaseModel):
+    """智能助手响应（非流式）"""
+
     code: int = 200
     message: str = "success"
     data: Dict[str, Any]
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -45,13 +52,12 @@ class DiagnosisResponse(BaseModel):
                 "message": "success",
                 "data": {
                     "status": "completed",
-                    "target_alert": {
-                        "alertname": "HighCPUUsage",
-                        "severity": "critical"
-                    },
-                    "diagnosis": {
-                        "root_cause": "数据库连接池耗尽",
-                        "recommendations": ["扩容数据库连接池", "优化SQL查询"]
+                    "task": "搜索LoRA实验记录",
+                    "result": {
+                        "found_notes": 2,
+                        "notes": [
+                            {"note_id": "exp_001", "title": "LLM微调实验记录 - LoRA方法"}
+                        ]
                     }
                 }
             }

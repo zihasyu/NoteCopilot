@@ -1,134 +1,86 @@
-# MCP Servers
+# MCP 服务器说明
 
-为 AIOps 智能诊断提供日志查询和监控数据工具。
+NoteCopilot 使用 MCP (Model Context Protocol) 协议构建了三个核心工具服务：
 
-## 📚 服务列表
+## 服务列表
 
-### CLS Server (`cls_server.py`)
-**日志查询服务** - 端口 8003
+### 1. NoteSearch Server (端口 8003)
 
-**核心工具：**
-- `get_current_timestamp` - 获取当前时间戳
-- `get_topic_info_by_name` - 查询日志主题
-- `search_log` - 日志搜索
-- `search_service_logs` - 服务日志查询（支持级别筛选）
-- `analyze_log_pattern` - 日志模式分析
+**功能**：实验记录和论文笔记的搜索与检索
 
-### Monitor Server (`monitor_server.py`)
-**监控数据服务** - 端口 8004
+**主要工具**：
+- `search_notes` - 搜索笔记库中的实验记录和论文笔记
+- `get_note_detail` - 获取笔记详细内容
+- `list_recent_notes` - 获取最近更新的笔记列表
+- `get_related_notes` - 获取相关笔记推荐
 
-**核心工具：**
-- `query_cpu_metrics` - CPU 使用率查询
-- `query_memory_metrics` - 内存使用查询
-- `query_process_list` - 进程列表
-- `search_historical_tickets` - 历史工单查询
-- `get_service_info` / `list_all_services` - 服务信息
-
-## 🚀 快速开始
-
-### 安装依赖
+**启动方式**：
 ```bash
-pip install fastmcp
+python mcp_servers/note_search_server.py
 ```
 
-### 启动服务
+### 2. PaperEnhance Server (端口 8004)
 
-**方式一：使用 Makefile（推荐）**
+**功能**：论文笔记增强和格式化
+
+**主要工具**：
+- `generate_paper_summary` - 根据论文内容生成结构化摘要
+- `enhance_note_format` - 优化笔记格式，增强可读性
+- `suggest_related_papers` - 根据主题推荐相关论文
+- `generate_citation_format` - 生成标准引用格式
+- `analyze_experiment_data` - 分析实验数据，生成分析报告
+
+**启动方式**：
 ```bash
-make mcp-start   # 启动所有 MCP 服务
-make mcp-stop    # 停止所有 MCP 服务
-make mcp-status  # 查看服务状态
+python mcp_servers/paper_enhance_server.py
 ```
 
-**方式二：手动启动**
+### 3. BlogUpload Server (端口 8005)
+
+**功能**：个人博客文章上传和管理
+
+**主要工具**：
+- `upload_blog_post` - 上传/发布博客文章
+- `update_blog_post` - 更新已发布的博客文章
+- `list_blog_posts` - 获取博客文章列表
+- `generate_blog_template` - 生成博客文章模板
+- `preview_blog_post` - 预览博客文章效果
+- `get_published_stats` - 获取博客发布统计
+
+**启动方式**：
 ```bash
-python mcp_servers/cls_server.py
-python mcp_servers/monitor_server.py
+python mcp_servers/blog_upload_server.py
 ```
 
-## 💡 使用示例
+## 快速启动
 
-### AIOps 诊断场景
+使用启动脚本一键启动所有 MCP 服务：
 
-```
-用户: data-sync-service 出现告警，请排查
-
-Agent 自动执行:
-1. list_all_services() → 查看所有服务状态
-2. get_service_info("data-sync-service") → 获取服务详情
-3. query_cpu_metrics("data-sync-service") → CPU 趋势分析
-4. search_service_logs("data-sync-service", level="error") → 错误日志
-5. analyze_log_pattern("data-sync-service") → 日志模式分析
-6. search_historical_tickets(service_name="data-sync-service") → 历史工单
-7. 综合分析 → 生成诊断报告和修复建议
+**Windows:**
+```powershell
+.\start-windows.bat
 ```
 
-### 工具参数示例
+**Linux/macOS:**
+```bash
+make start
+```
 
-**查询 CPU 指标：**
+## MCP 协议说明
+
+MCP (Model Context Protocol) 是 Anthropic 推出的开放协议，用于标准化 AI 模型与外部工具的交互。NoteCopilot 通过 MCP 实现：
+
+- 标准化的工具发现和调用
+- 类型安全的参数传递
+- 可扩展的工具生态
+- 与 LangChain/LangGraph 无缝集成
+
+## 配置说明
+
+MCP 服务器地址在 `app/config.py` 中配置：
+
 ```python
-query_cpu_metrics(
-    service_name="data-sync-service",
-    start_time="2024-02-14 02:00:00",
-    interval="1m"
-)
+mcp_note_search_url: str = "http://localhost:8003/mcp"
+mcp_paper_enhance_url: str = "http://localhost:8004/mcp"
+mcp_blog_upload_url: str = "http://localhost:8005/mcp"
 ```
-
-**搜索错误日志：**
-```python
-search_service_logs(
-    service_name="data-sync-service",
-    log_level="error",
-    keyword="timeout",
-    limit=100
-)
-```
-
-**搜索历史工单：**
-```python
-search_historical_tickets(
-    service_name="data-sync-service",
-    issue_type="cpu",
-    limit=10
-)
-```
-
-## 🔧 高级配置
-
-### 接入真实 API
-
-当前返回模拟数据。接入真实 API 步骤：
-
-**腾讯云 CLS：**
-```bash
-# 安装 SDK
-pip install tencentcloud-sdk-python
-
-# 配置环境变量
-export TENCENTCLOUD_SECRET_ID="your-id"
-export TENCENTCLOUD_SECRET_KEY="your-key"
-
-# 在 cls_server.py 中集成
-from tencentcloud.cls.v20201016 import cls_client
-```
-
-**其他监控系统：**
-- Prometheus
-- Grafana
-- 云监控（腾讯云/阿里云/AWS）
-- 自建监控平台
-
-### 自定义 Mock 数据
-
-修改各 Server 文件中的数据生成逻辑，模拟实际场景。
-
-## 📚 参考资料
-
-- [FastMCP 文档](https://github.com/jlowin/fastmcp)
-- [MCP 协议](https://modelcontextprotocol.io/)
-- [LangGraph 文档](https://langchain-ai.github.io/langgraph/)
-- [主项目 README](../README.md)
-
----
-
-**注意**: 当前版本返回模拟数据，生产环境需配置真实 API。

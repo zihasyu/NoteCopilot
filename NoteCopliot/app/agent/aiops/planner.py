@@ -30,7 +30,7 @@ planner_prompt = ChatPromptTemplate.from_messages(
         (
             "system",
             dedent("""
-                作为一个专家级别的规划者，你需要将复杂的任务分解为可执行的步骤。
+                作为一个专家级别的研究助手规划者，你需要将复杂的笔记管理任务分解为可执行的步骤。
 
                 可用工具列表（用于制定计划时参考）：
 
@@ -47,12 +47,18 @@ planner_prompt = ChatPromptTemplate.from_messages(
                 - 步骤描述要具体、可操作
                 - **如果有相关经验文档，请参考其中的方法和步骤制定计划**
 
-                示例输入："分析当前系统的性能问题"
-                示例输出（假设有对应工具）：
-                步骤1: 使用 get_metrics 工具收集系统的 CPU 和内存使用情况
-                步骤2: 使用 query_logs 工具检查最近的错误日志
-                步骤3: 使用 query_database 工具分析慢查询日志
-                步骤4: 综合以上信息生成性能分析报告
+                任务类型示例：
+                1. 实验记录检索: 搜索历史实验、对比结果、提取关键发现
+                2. 论文笔记增强: 生成摘要、优化格式、推荐相关论文
+                3. 博客文章发布: 整理内容、生成模板、预览效果、上传发布
+
+                示例输入："帮我整理LoRA实验记录并生成博客文章"
+                示例输出：
+                步骤1: 使用 search_notes 工具搜索LoRA相关实验记录
+                步骤2: 使用 get_note_detail 工具获取实验详细内容
+                步骤3: 使用 analyze_experiment_data 工具分析实验数据
+                步骤4: 使用 generate_blog_template 工具生成博客模板
+                步骤5: 使用 upload_blog_post 工具发布博客文章
             """).strip(),
         ),
         ("placeholder", "{messages}"),

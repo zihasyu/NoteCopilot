@@ -21,7 +21,8 @@ class VectorStoreManager:
         """初始化向量存储管理器"""
         self.vector_store = None
         self.collection_name = COLLECTION_NAME
-        self._initialize_vector_store()
+        # 延迟初始化：不在 __init__ 中立即初始化
+        # 而是在第一次 get_vector_store() 时初始化
 
     def _initialize_vector_store(self):
         """初始化 Milvus VectorStore"""
@@ -74,7 +75,7 @@ class VectorStoreManager:
             
             # LangChain Milvus 的 add_documents 会自动调用 embedding_function
             # 并进行批量处理，性能更好
-            result_ids = self.vector_store.add_documents(documents, ids=ids)
+            result_ids = self.get_vector_store().add_documents(documents, ids=ids)
             
             elapsed = time.time() - start_time
             logger.info(
@@ -117,11 +118,13 @@ class VectorStoreManager:
 
     def get_vector_store(self) -> Milvus:
         """
-        获取 VectorStore 实例
+        获取 VectorStore 实例（延迟初始化）
 
         Returns:
             Milvus: VectorStore 实例
         """
+        if self.vector_store is None:
+            self._initialize_vector_store()
         return self.vector_store
 
     def similarity_search(self, query: str, k: int = 3) -> List[Document]:
@@ -136,7 +139,7 @@ class VectorStoreManager:
             List[Document]: 相关文档列表
         """
         try:
-            docs = self.vector_store.similarity_search(query, k=k)
+            docs = self.get_vector_store().similarity_search(query, k=k)
             logger.debug(f"相似度搜索完成: query='{query}', 结果数={len(docs)}")
             return docs
         except Exception as e:
