@@ -32,8 +32,8 @@ if not exist .venv (
 REM Activate and install dependencies
 echo [2/6] Installing dependencies...
 call .venv\Scripts\activate.bat >nul 2>&1
-python -m pip install --upgrade pip -q
-pip install -r requirements.txt -q
+python -m pip install --upgrade pip 
+pip install -r requirements.txt 
 
 REM Create directories
 echo [3/6] Setting up directories...
@@ -50,7 +50,7 @@ if not exist .env (
 
 REM Start Docker services
 echo [5/6] Starting Milvus...
-docker-compose up -d --quiet-pull 2>nul
+docker-compose up -d --quiet-pull 
 
 echo [INFO] Waiting for Milvus to start (30s)...
 timeout /t 30 /nobreak >nul
