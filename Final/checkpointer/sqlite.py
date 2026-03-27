@@ -150,4 +150,7 @@ def create_checkpointer(db_path: str = "./checkpoints/langgraph.db"):
     import os
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
-    return SqliteSaver.from_conn_string(db_path)
+    # SqliteSaver 需要直接传入 sqlite3.Connection
+    # check_same_thread=False 是因为实现使用了锁来确保线程安全
+    conn = sqlite3.connect(db_path, check_same_thread=False)
+    return SqliteSaver(conn)
